@@ -8,23 +8,19 @@ import java.net.Socket;
 public class Receiver {
 
     public static void listen(Socket socket, BufferedReader bufferedReader) throws InterruptedException, IOException {
-        System.out.println("Listening...");
+//        System.out.println("Listening...");
+        PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
+        printWriter.println("Listening..");
+        printWriter.flush();
+
         while (true) {
             Thread.currentThread().interrupt();
-
-            PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
-            printWriter.println("PING");
-            printWriter.flush();
-
 
 
             String msg = bufferedReader.readLine();
 
 
 
-            if (msg.equals("PONG")) {
-                System.out.println("CLIENTS CONNECTED: " + Server.clients.size());
-            }
 
             // if msg contains direct message
             if (msg.contains("DM")) {
@@ -63,5 +59,5 @@ public class Receiver {
         }
 
 
-        }
+    }
 }

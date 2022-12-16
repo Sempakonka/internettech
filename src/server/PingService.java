@@ -16,22 +16,26 @@ public class PingService {
         while (true){
             PrintWriter pw = new PrintWriter(s.getOutputStream());
             if (!isWaiting) {
+                System.out.println("sending to client ping ");
                 pw.write("PING");
                 pw.flush();
                 isWaiting = true;
             }
-
+            System.out.println(System.nanoTime() - startTime);
             String msg = bf.readLine();
 
             if(msg.equals("PONG")){
                 long elapsedTime = System.nanoTime() - startTime;
                 double seconds = (double) elapsedTime / 1_000_000_000;
-
+                System.out.println("seconds " + seconds);
                 if (seconds <= 5) {
+                    System.out.println("got pong within time");
                     // reset the stopwatch
-                    startTime = System.nanoTime();
                     isWaiting = false;
+                    Thread.sleep(5000);
+                    startTime = System.nanoTime();
                 } else {
+                    System.out.println("closingggg");
                     bf.close();
                     pw.close();
                     s.close();

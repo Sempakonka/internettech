@@ -28,7 +28,7 @@ public class Server extends Thread {
                     Receiver.listen(s, bf);
                 }
                 catch (InterruptedException | IOException e) {
-                    System.out.println("User has logged out");
+                    System.out.println(e);
                 }
 
             });
@@ -38,7 +38,7 @@ public class Server extends Thread {
                     PingService.listen(s, bf);
                 }
                 catch (InterruptedException | IOException e) {
-                    System.out.println("User has logged out");
+                    System.out.println(e);
                 }
 
             });

@@ -9,7 +9,7 @@ public class Main {
         //   Client client = new Client();
         Connection connection = new Connection();
         connection.connect();
-        CommunicationManager communicationManager = new CommunicationManager();
+        CommunicationManager communicationManager = new CommunicationManager(connection);
         commandLoop(connection, communicationManager);
     }
 
