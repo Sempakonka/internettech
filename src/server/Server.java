@@ -1,49 +1,51 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.HashMap;
+import server.PingService;
+import server.Receiver;
+
+import java.net.*;
+import java.io.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Server {
+public class Server extends Thread {
 
-    static Map<String, Socket> clients = new ConcurrentHashMap<>();
-
-        public static void main(String[] args) {
-            try{
-                    ServerSocket serverSocket = new ServerSocket(1337);
-            while (true) {
-                System.out.println("waiting...");
-                    Socket socket = serverSocket.accept();
-
-                    System.out.println("Client connected");
-
-                    InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
-                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+    public static Map<String, Socket> clients = new ConcurrentHashMap<>();
 
 
+    public static void main(String[] args) throws IOException, InterruptedException {
+        ServerSocket ss = new ServerSocket(1337);
+        while (true) {
+            Socket s = ss.accept();
 
-                    // start new thread for listening
-                    Thread thread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Reciever.listen(socket, bufferedReader);
-                            } catch (InterruptedException | IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
+            System.out.println("Client connected");
 
-                    thread.start();
-            }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            InputStreamReader in = new InputStreamReader(s.getInputStream());
+            BufferedReader bf = new BufferedReader(in);
+
+            Thread thread = new Thread(() -> {
+                try {
+                    Receiver.listen(s, bf);
+                }
+                catch (InterruptedException | IOException e) {
+                    System.out.println("User has logged out");
+                }
+
+            });
+
+            Thread pingThread = new Thread(() -> {
+                try {
+                    PingService.listen(s, bf);
+                }
+                catch (InterruptedException | IOException e) {
+                    System.out.println("User has logged out");
+                }
+
+            });
+
+            thread.start();
+            pingThread.start();
+
         }
+    }
 }

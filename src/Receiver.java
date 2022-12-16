@@ -11,7 +11,7 @@ public class Receiver {
                 msg = reader.readLine();
 
 
-                System.out.println(msg);
+                System.out.println("Received msg: " + msg);
                 if (msg == null) {
                     break;
                 }

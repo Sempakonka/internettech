@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class Reciever {
+public class Receiver {
 
     public static void listen(Socket socket, BufferedReader bufferedReader) throws InterruptedException, IOException {
         System.out.println("Listening...");
