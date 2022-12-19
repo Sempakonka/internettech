@@ -7,24 +7,27 @@ import java.net.Socket;
 import java.util.Timer;
 
 public class PingService {
-    public static void listen(Socket s, BufferedReader bf) throws InterruptedException, IOException {
+    public static void listen(Socket socket, BufferedReader bufferedReader) throws InterruptedException, IOException {
         Timer timer = new Timer();
         long startTime = System.nanoTime();
         boolean isWaiting = false;
 
+        // wait one second before sending the first ping
+        Thread.sleep(2000);
+        PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
 
         while (true){
-            PrintWriter pw = new PrintWriter(s.getOutputStream());
             if (!isWaiting) {
                 System.out.println("sending to client ping ");
-                pw.write("PING");
-                pw.flush();
+                printWriter.println("PING");
+                printWriter.flush();
                 isWaiting = true;
             }
             System.out.println(System.nanoTime() - startTime);
-            String msg = bf.readLine();
+            String msg = bufferedReader.readLine();
 
             if(msg.equals("PONG")){
+                System.out.println("received pong from client");
                 long elapsedTime = System.nanoTime() - startTime;
                 double seconds = (double) elapsedTime / 1_000_000_000;
                 System.out.println("seconds " + seconds);
@@ -36,9 +39,9 @@ public class PingService {
                     startTime = System.nanoTime();
                 } else {
                     System.out.println("closingggg");
-                    bf.close();
-                    pw.close();
-                    s.close();
+                    bufferedReader.close();
+                    printWriter.close();
+                    socket.close();
                 }
 
             }

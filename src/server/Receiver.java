@@ -10,8 +10,7 @@ public class Receiver {
     public static void listen(Socket socket, BufferedReader bufferedReader) throws InterruptedException, IOException {
 //        System.out.println("Listening...");
         PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
-        printWriter.println("Listening..");
-        printWriter.flush();
+
 
         while (true) {
             Thread.currentThread().interrupt();
@@ -21,6 +20,7 @@ public class Receiver {
 
 
 
+            //TODO: contains is not a good way to check for a command, use startsWith instead
 
             // if msg contains direct message
             if (msg.contains("DM")) {

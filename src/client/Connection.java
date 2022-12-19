@@ -1,3 +1,5 @@
+package client;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -87,6 +89,6 @@ public class Connection {
         reader = null;
         writer = null;
 
-        System.out.println("Connection closed");
+        System.out.println("client.Connection closed");
     }
 }

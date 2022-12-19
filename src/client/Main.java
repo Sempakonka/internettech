@@ -1,3 +1,5 @@
+package client;
+
 import java.io.BufferedReader;
 
 import java.io.IOException;
@@ -26,7 +28,7 @@ public class Main {
             System.out.println("Enter 'logout' to log out.");
             label:
             do {
-                assert Connection.reader != null && Connection.writer != null && Connection.inputStream != null : "Connection not established";
+                assert Connection.reader != null && Connection.writer != null && Connection.inputStream != null : "client.Connection not established";
 
                 str = obj.readLine();
                 // make all methods in Conn class
