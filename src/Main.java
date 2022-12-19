@@ -22,6 +22,8 @@ public class Main {
             System.out.println("Enter lines of text.");
             System.out.println("Enter 'stop' to quit.");
             System.out.println("Enter 'login' to login.");
+            System.out.println("Enter 'dm' to send a direct message.");
+            System.out.println("Enter 'survey' to start a survey.");
             System.out.println("Enter 'broadcast' to broadcast a message.");
             System.out.println("Enter 'logout' to log out.");
             label:
@@ -40,6 +42,17 @@ public class Main {
                         System.out.println("Enter your message:");
                         str = obj.readLine();
                         communicationManager.broadcast(str);
+                        break;
+                    case "dm":
+                        System.out.println("Who do you want to message:");
+                        str = obj.readLine();
+                        System.out.println("What do you want to send to " + str +":");
+                        String msg = obj.readLine();
+                        communicationManager.directMessage(str, msg);
+                        break;
+                    case "survey":
+                        System.out.println("Do you want to create a list");
+                        communicationManager.survey();
                         break;
                     case "logout":
                         communicationManager.logout();

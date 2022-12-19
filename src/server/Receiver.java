@@ -12,15 +12,13 @@ public class Receiver {
         PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
         printWriter.println("Listening..");
         printWriter.flush();
+        int surveyWaiting = 0;
+
 
         while (true) {
             Thread.currentThread().interrupt();
 
-
             String msg = bufferedReader.readLine();
-
-
-
 
             // if msg contains direct message
             if (msg.contains("DM")) {
@@ -54,6 +52,33 @@ public class Receiver {
                         clientWriter.flush();
                     }
                 }
+            }
+            if(msg.contains("SURVEY")) {
+                int surveyTakers = surveyWaiting + 1;
+
+                while (surveyTakers < 3){
+                    printWriter.println("Waiting for more participants...");
+                    printWriter.println("Current surveyors: "+ surveyTakers);
+                    printWriter.flush();
+                    Thread.sleep(1000);
+                }
+
+                if(surveyTakers > 3){
+                    long startTime = System.nanoTime();
+                    long elapsedTime = System.nanoTime() - startTime;
+                    double seconds = (double) elapsedTime / 1_000_000_000;
+                    System.out.println(seconds + " seconds");
+                    int minutes = (int) (seconds /60);
+                    System.out.println("Minutes " + minutes);
+
+                    while (minutes < 5){
+
+                        surveyTakers = 0;
+                    }
+                }
+
+
+
             }
             System.out.println(msg);
         }

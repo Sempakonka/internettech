@@ -32,7 +32,7 @@ public class Server extends Thread {
                 }
 
             });
-
+//
             Thread pingThread = new Thread(() -> {
                 try {
                     PingService.listen(s, bf);

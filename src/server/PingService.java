@@ -8,7 +8,6 @@ import java.util.Timer;
 
 public class PingService {
     public static void listen(Socket s, BufferedReader bf) throws InterruptedException, IOException {
-        Timer timer = new Timer();
         long startTime = System.nanoTime();
         boolean isWaiting = false;
 

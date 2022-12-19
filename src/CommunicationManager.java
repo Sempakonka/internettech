@@ -21,6 +21,14 @@ public class CommunicationManager {
         connection.send("BCST "+message);
     }
 
+    public void directMessage(String name, String message) throws IOException {
+        connection.send("DM "+name + " " + message);
+    }
+
+    public void survey() throws IOException {
+        connection.send("SURVEY");
+    }
+
     public void logout() throws IOException {
         connection.send("QUIT");
     }
