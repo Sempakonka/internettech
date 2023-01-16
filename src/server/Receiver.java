@@ -5,22 +5,22 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import static server.Server.currentClients;
+
 public class Receiver {
 
     public static void listen(Socket socket, BufferedReader bufferedReader) throws InterruptedException, IOException {
 //        System.out.println("Listening...");
         PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
+        printWriter.println("Listening..");
+        printWriter.flush();
+        int surveyWaiting = 0;
 
 
         while (true) {
             Thread.currentThread().interrupt();
 
-
             String msg = bufferedReader.readLine();
-
-
-
-            //TODO: contains is not a good way to check for a command, use startsWith instead
 
             // if msg contains direct message
             if (msg.contains("DM")) {
@@ -54,6 +54,39 @@ public class Receiver {
                         clientWriter.flush();
                     }
                 }
+            }
+            if(msg.contains("SURVEY-JOIN")) {
+                int surveyTakers = surveyWaiting + 1;
+                System.out.println(currentClients);
+                while (currentClients < 3){
+                    printWriter.println("Waiting for more participants...");
+                    printWriter.println("Current surveyors: "+ surveyTakers);
+                    printWriter.flush();
+                    Thread.sleep(1000);
+                }
+
+                if(currentClients > 3){
+                    long startTime = System.nanoTime();
+                    long elapsedTime = System.nanoTime() - startTime;
+                    double seconds = (double) elapsedTime / 1_000_000_000;
+                    System.out.println(seconds + " seconds");
+                    int minutes = (int) (seconds /60);
+                    System.out.println("Minutes " + minutes);
+
+                    while (minutes < 5){
+
+                    }
+                }
+            }
+            if(msg.contains("SURVEY-CREATE")){
+
+            }
+            if(msg.contains("STOP"))
+            {
+                currentClients--;
+                printWriter.close();
+                bufferedReader.close();
+                socket.close();
             }
             System.out.println(msg);
         }

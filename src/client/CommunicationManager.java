@@ -23,6 +23,19 @@ public class CommunicationManager {
         connection.send("BCST "+message);
     }
 
+    public void directMessage(String name, String message) throws IOException {
+        connection.send("DM "+name + " " + message);
+    }
+
+    public void surveyCreate(String option) throws IOException {
+        connection.send("SURVEY-CREATE");
+    }
+
+    public void surveyJoin(){
+        connection.send("SURVEY-JOIN");
+    }
+
+
     public void logout() throws IOException {
         connection.send("QUIT");
     }

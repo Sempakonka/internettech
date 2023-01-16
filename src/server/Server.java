@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Server extends Thread {
 
     public static Map<String, Socket> clients = new ConcurrentHashMap<>();
+    public static int currentClients = 0;
 
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -19,6 +20,7 @@ public class Server extends Thread {
             Socket s = ss.accept();
 
             System.out.println("Client connected");
+            currentClients++;
 
             InputStreamReader in = new InputStreamReader(s.getInputStream());
             BufferedReader bf = new BufferedReader(in);
