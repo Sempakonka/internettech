@@ -5,13 +5,13 @@ import java.io.IOException;
 public class CommunicationManager {
     private final Connection connection;
 
-    public CommunicationManager(Connection connection){
+    public CommunicationManager(Connection connection) {
         this.connection = connection;
     }
 
     // login
     public void login(String name) throws IOException {
-        connection.send("IDENT "+name);
+        connection.send("IDENT " + name);
     }
 
     public void customCommand(String command) throws IOException {
@@ -20,21 +20,25 @@ public class CommunicationManager {
 
     // broadcast a message to all clients
     public void broadcast(String message) throws IOException {
-        connection.send("BCST "+message);
+        connection.send("BCST " + message);
     }
 
     public void directMessage(String name, String message) throws IOException {
-        connection.send("DM "+name + " " + message);
+        connection.send("DM " + name + " " + message);
     }
 
     public void surveyCreate(String option) throws IOException {
         connection.send("SURVEY-CREATE");
     }
 
-    public void surveyJoin(){
+    public void surveyJoin() {
         connection.send("SURVEY-JOIN");
     }
 
+    public void askToSendFile(String path, String downloader, String uploader) throws IOException {
+        // "FILE-ASK "+uploader + " " + downloader + " " + filepath
+        connection.send("FILE-ASK " + uploader + " " + downloader + " " + path);
+    }
 
     public void logout() throws IOException {
         connection.send("QUIT");

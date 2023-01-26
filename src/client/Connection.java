@@ -8,17 +8,18 @@ public class Connection {
     public static InputStream inputStream = null;
     public static BufferedReader reader = null;
     public static PrintWriter writer = null;
+    public static Socket textSocket = null;
 
 
 
     // establish connection with server
     public void connect() throws IOException {
         try {
-            Socket socket = new Socket("127.0.0.1", 1337);
+            textSocket = new Socket("127.0.0.1", 1337);
 
             // Haal de input- en output stream uit de socket op
-            inputStream = socket.getInputStream();
-            OutputStream outputStream = socket.getOutputStream();
+            inputStream = textSocket.getInputStream();
+            OutputStream outputStream = textSocket.getOutputStream();
             writer = new PrintWriter(outputStream);
             // Blokkeer de thread tot er een volledige regel binnenkomt
             reader = new BufferedReader(
@@ -62,6 +63,31 @@ public class Connection {
                       String message = "PONG";
                       send(message);
                 }
+
+                // if msg contains FILE-ACCEPT
+                if (msg.contains("FILE-ACCEPT")) {
+                    // split the message
+                    String[] split = msg.split(" ");
+                    // get the username
+                    String path = split[3];
+
+                    // new FileSender thread
+                  //  Thread thread = new Thread(new FileSender(path));
+               //     thread.start();
+                }
+
+                if (msg.contains("FILE-ASK")) {
+                    Thread thread = new Thread(new FileReceiver());
+                    thread.start();
+                    // sned FILE-ACCEPT back in this protocol
+                    // "FILE-ACCEPT "+uploader + " " + downloader + " " + filepath
+                    String[] split = msg.split(" ");
+                    String uploader = split[1];
+                    String downloader = split[2];
+                    String filepath = split[3];
+                    String message = "FILE-ACCEPT " + uploader + " " + downloader + " " + filepath;
+                    send(message);
+                }
             }
             catch (IOException ignored) {
 
@@ -69,15 +95,12 @@ public class Connection {
         }
     }
 
-
-
     public synchronized void send(String message)  {
         System.out.println("Sending message: " + message);
         // send a message to the server
         Connection.writer.println(message);
         Connection.writer.flush();
     }
-
 
     // close connection
     public void close() throws IOException {

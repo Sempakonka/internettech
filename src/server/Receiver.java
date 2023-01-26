@@ -21,6 +21,7 @@ public class Receiver {
             Thread.currentThread().interrupt();
 
             String msg = bufferedReader.readLine();
+            System.out.println("Message: " + msg);
 
             // if msg contains direct message
             if (msg.contains("DM")) {
@@ -40,6 +41,7 @@ public class Receiver {
                 String[] split = msg.split(" ");
                 // get the username
                 String username = split[1];
+                System.out.println("Username: " + username);
                 // add the username to the hashmap
                 Server.clients.put(username, socket);
                 // send a message to the client
@@ -88,9 +90,37 @@ public class Receiver {
                 bufferedReader.close();
                 socket.close();
             }
-            System.out.println(msg);
+            if (msg.contains("FILE-ASK")) {
+                // this is the protocol
+                // "FILE-ASK "+uploader + " " + downloader + " " + filepath
+                // ask the receiver if he wants to receive the file
+                String[] split = msg.split(" ");
+                String uploader = split[1];
+                String downloader = split[2];
+                String filepath = split[3];
+
+                System.out.println("File ask from " + uploader + " to " + downloader + " for " + filepath);
+
+                // send the receiver a message
+                PrintWriter receiverWriter = new PrintWriter(Server.clients.get(downloader).getOutputStream());
+                receiverWriter.println("FILE-ASK " + uploader + " " + downloader + " " + filepath);
+                receiverWriter.flush();
+            }
+            if (msg.contains("FILE-ACCEPT")) {
+                // this is the protocol
+                // "FILE-ACCEPT "+uploader + " " + downloader + " " + filepath
+                // ask the receiver if he wants to receive the file
+                String[] split = msg.split(" ");
+                String uploader = split[1];
+                String downloader = split[2];
+                String filepath = split[3];
+
+
+                // send the receiver a message
+                PrintWriter receiverWriter = new PrintWriter(Server.clients.get(uploader).getOutputStream());
+                receiverWriter.println("FILE-ACCEPT " + uploader + " " + downloader + " " + filepath);
+                receiverWriter.flush();
+            }
         }
-
-
     }
 }

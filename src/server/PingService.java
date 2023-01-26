@@ -15,36 +15,37 @@ public class PingService {
         // wait one second before sending the first ping
         Thread.sleep(2000);
         PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
+        System.out.println("starting ping service");
 
-        while (true){
-            if (!isWaiting) {
-                System.out.println("sending to client ping ");
-                printWriter.println("PING");
-                printWriter.flush();
-                isWaiting = true;
-            }
-            System.out.println(System.nanoTime() - startTime);
-            String msg = bufferedReader.readLine();
-
-            if(msg.equals("PONG")){
-                System.out.println("received pong from client");
-                long elapsedTime = System.nanoTime() - startTime;
-                double seconds = (double) elapsedTime / 1_000_000_000;
-                System.out.println("seconds " + seconds);
-                if (seconds <= 5) {
-                    System.out.println("got pong within time");
-                    // reset the stopwatch
-                    isWaiting = false;
-                    Thread.sleep(5000);
-                    startTime = System.nanoTime();
-                } else {
-                    System.out.println("closingggg");
-                    bufferedReader.close();
-                    printWriter.close();
-                    socket.close();
-                }
-
-            }
-        }
+//
+//        while (true){
+//            if (!isWaiting) {
+//                System.out.println("sending to client ping ");
+//                printWriter.println("PING");
+//                printWriter.flush();
+//                isWaiting = true;
+//            }
+//            String msg = bufferedReader.readLine();
+//
+//            if(msg.equals("PONG")){
+//                System.out.println("received pong from client");
+//                long elapsedTime = System.nanoTime() - startTime;
+//                double seconds = (double) elapsedTime / 1_000_000_000;
+//                System.out.println("seconds " + seconds);
+//                if (seconds <= 5) {
+//                    System.out.println("got pong within time");
+//                    // reset the stopwatch
+//                    isWaiting = false;
+//                    Thread.sleep(5000);
+//                    startTime = System.nanoTime();
+//                } else {
+//                    System.out.println("closingggg");
+//                    bufferedReader.close();
+//                    printWriter.close();
+//                    socket.close();
+//                }
+//
+//            }
+//        }
     }
 }
