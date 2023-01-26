@@ -77,8 +77,6 @@ public class Server extends Thread {
 
 
                     int bytes = 0;
-                    FileOutputStream fileOutputStream = new FileOutputStream("from_server.txt");
-                    System.out.println("fileOutputStream: " + fileOutputStream);
 
                     long size = dataInputStream.readLong();     // read file size
                     byte[] buffer = new byte[4 * 1024];
@@ -87,7 +85,6 @@ public class Server extends Thread {
                         dataOutputStream.write(buffer, 0, bytes);
                         size -= bytes;      // read upto file size
                     }
-                    fileOutputStream.close();
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
