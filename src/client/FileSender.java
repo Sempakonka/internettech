@@ -9,12 +9,6 @@ public class FileSender implements Runnable {
     private String filePath;
 
     public FileSender(String filePath) {
-        try {
-            this.socket = new Socket("127.0.0.1", 1338);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         this.receiver = "sem1";
         this.filePath = filePath;
     }
@@ -22,6 +16,8 @@ public class FileSender implements Runnable {
     @Override
     public void run() {
         try {
+            this.socket = new Socket("127.0.0.1", 1338);
+            Thread.sleep(3000);
         //DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
         DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
         int bytes = 0;
@@ -38,6 +34,8 @@ public class FileSender implements Runnable {
         }
         fileInputStream.close();
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

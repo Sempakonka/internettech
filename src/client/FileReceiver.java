@@ -13,15 +13,16 @@ public class FileReceiver implements Runnable {
     @Override
     public void run() {
         try {
+            Thread.sleep(2000);
             System.out.println("Connecting as downloader");
             Socket socket = new Socket("127.0.0.1", 1338);
             InputStream inputStream = socket.getInputStream();
-            FileOutputStream fileOutputStream = new FileOutputStream("received.jpeg");
+            FileOutputStream fileOutputStream = new FileOutputStream("received1.jpeg");
             // await one second for the file to be sent
             byte[] buffer = new byte[8192];
             int bytesRead;
             while ((bytesRead = inputStream.read(buffer)) != -1) {
-                System.out.println("sending " + bytesRead + " bytes of file");
+                System.out.println("receiving " + bytesRead + " bytes of file");
                 fileOutputStream.write(buffer, 0, bytesRead);
             }
             fileOutputStream.flush();
@@ -30,6 +31,8 @@ public class FileReceiver implements Runnable {
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
     }

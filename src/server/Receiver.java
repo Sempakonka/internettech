@@ -21,7 +21,7 @@ public class Receiver {
             Thread.currentThread().interrupt();
 
             String msg = bufferedReader.readLine();
-            System.out.println("Message: " + msg);
+        //    System.out.println("Message: " + msg);
 
             // if msg contains direct message
             if (msg.contains("DM")) {

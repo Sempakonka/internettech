@@ -63,25 +63,33 @@ public class Server extends Thread {
 
                 while (true) {
                     Socket clientSocket = serverSocket.accept();
-                    DataOutputStream dataOutputStream = null;
                     DataInputStream dataInputStream = null;
                     System.out.println(clientSocket + " connected.");
                     dataInputStream = new DataInputStream(clientSocket.getInputStream());
-                    dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
+
+
+                    Socket downloadSocket = serverSocket.accept();
+                    System.out.println(downloadSocket + " connected.");
+                    DataOutputStream dataOutputStream = null;
+                    dataOutputStream = new DataOutputStream(downloadSocket.getOutputStream());
+                    System.out.println("dataOutputStream: " + dataOutputStream);
+
+
 
                     int bytes = 0;
                     FileOutputStream fileOutputStream = new FileOutputStream("from_server.txt");
+                    System.out.println("fileOutputStream: " + fileOutputStream);
 
                     long size = dataInputStream.readLong();     // read file size
-                    byte[] buffer = new byte[4*1024];
-                    while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {
+                    byte[] buffer = new byte[4 * 1024];
+                    while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
                         System.out.println("bytes: " + bytes);
-                        fileOutputStream.write(buffer,0,bytes);
+                        dataOutputStream.write(buffer, 0, bytes);
                         size -= bytes;      // read upto file size
                     }
                     fileOutputStream.close();
                 }
-                } catch (IOException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });

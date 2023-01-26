@@ -77,8 +77,8 @@ public class Connection {
                 }
 
                 if (msg.contains("FILE-ASK")) {
-                   // Thread thread = new Thread(new FileReceiver());
-                  //  thread.start();
+                    Thread thread = new Thread(new FileReceiver());
+                    thread.start();
                     // sned FILE-ACCEPT back in this protocol
                     // "FILE-ACCEPT "+uploader + " " + downloader + " " + filepath
                     String[] split = msg.split(" ");
