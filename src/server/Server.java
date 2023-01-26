@@ -58,33 +58,30 @@ public class Server extends Thread {
 
         // second thread to listen for port 1338
         Thread thread2 = new Thread(() -> {
-            ServerSocket ss;
             try {
-                ss = new ServerSocket(1338);
+                ServerSocket serverSocket = new ServerSocket(1338);
 
                 while (true) {
-                    Socket s = ss.accept();
+                    Socket clientSocket = serverSocket.accept();
+                    DataOutputStream dataOutputStream = null;
+                    DataInputStream dataInputStream = null;
+                    System.out.println(clientSocket + " connected.");
+                    dataInputStream = new DataInputStream(clientSocket.getInputStream());
+                    dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
 
-                    System.out.println("file transfer client connected");
-                 //   currentClients++;
+                    int bytes = 0;
+                    FileOutputStream fileOutputStream = new FileOutputStream("from_server.txt");
 
-                    FileInputStream fileInputStream = new FileInputStream("/Users/sempakonka/Desktop/internetTech/internet_tech/file_to_send.jpeg");
-                    byte[] buffer = new byte[8192];
-                    fileInputStream.read(buffer,0, buffer.length);
-                    OutputStream outputStream = s.getOutputStream();
-                    outputStream.write(buffer, 0, buffer.length);
-                    // Start the file transfer service
-//                    Thread thread = new Thread(() -> {
-//                        try {
-//                            FilePasser.listen(s, bf);
-//                        } catch (IOException e) {
-//                            throw new RuntimeException(e);
-//                        }
-//                    });
-
-                //     thread.start();
+                    long size = dataInputStream.readLong();     // read file size
+                    byte[] buffer = new byte[4*1024];
+                    while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {
+                        System.out.println("bytes: " + bytes);
+                        fileOutputStream.write(buffer,0,bytes);
+                        size -= bytes;      // read upto file size
+                    }
+                    fileOutputStream.close();
                 }
-            } catch (IOException e) {
+                } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });

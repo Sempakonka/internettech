@@ -72,13 +72,13 @@ public class Connection {
                     String path = split[3];
 
                     // new FileSender thread
-                  //  Thread thread = new Thread(new FileSender(path));
-               //     thread.start();
+                    Thread thread = new Thread(new FileSender(path));
+                    thread.start();
                 }
 
                 if (msg.contains("FILE-ASK")) {
-                    Thread thread = new Thread(new FileReceiver());
-                    thread.start();
+                   // Thread thread = new Thread(new FileReceiver());
+                  //  thread.start();
                     // sned FILE-ACCEPT back in this protocol
                     // "FILE-ACCEPT "+uploader + " " + downloader + " " + filepath
                     String[] split = msg.split(" ");

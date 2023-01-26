@@ -13,16 +13,25 @@ public class FileReceiver implements Runnable {
     @Override
     public void run() {
         try {
-            byte[] b = new byte[8192];
-            System.out.println("Listening as downloader");
-            Socket sr =  new Socket( "127.0.0.1", 1338);
-            InputStream is = sr.getInputStream();
-            FileOutputStream fr = new FileOutputStream("received.jpeg");
-            is.read(b, 0, b.length);
-            fr.write(b, 0, b.length);
+            System.out.println("Connecting as downloader");
+            Socket socket = new Socket("127.0.0.1", 1338);
+            InputStream inputStream = socket.getInputStream();
+            FileOutputStream fileOutputStream = new FileOutputStream("received.jpeg");
+            // await one second for the file to be sent
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                System.out.println("sending " + bytesRead + " bytes of file");
+                fileOutputStream.write(buffer, 0, bytesRead);
+            }
+            fileOutputStream.flush();
+            inputStream.close();
+            fileOutputStream.close();
+            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
 //    public void connect() throws IOException {

@@ -22,26 +22,23 @@ public class FileSender implements Runnable {
     @Override
     public void run() {
         try {
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            out.println("SEND " + receiver);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String response = in.readLine();
-            if (response.equals("READY")) {
-                OutputStream outputStream = socket.getOutputStream();
-                FileInputStream fileInputStream = new FileInputStream(filePath);
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-                while ((bytesRead = fileInputStream.read(buffer)) > 0) {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
-                fileInputStream.close();
-                outputStream.close();
-            } else {
-                System.out.println("Error: Receiver is not ready");
-            }
-            socket.close();
+        //DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        int bytes = 0;
+        File file = new File(filePath);
+        FileInputStream fileInputStream = new FileInputStream(file);
+
+        // send file size
+        dataOutputStream.writeLong(file.length());
+        // break file into chunks
+        byte[] buffer = new byte[4*1024];
+        while ((bytes=fileInputStream.read(buffer))!=-1){
+            dataOutputStream.write(buffer,0,bytes);
+            dataOutputStream.flush();
+        }
+        fileInputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }
