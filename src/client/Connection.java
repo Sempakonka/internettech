@@ -1,12 +1,18 @@
+
+package client;
+
+import server.Server;
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Connection {
 
     public static InputStream inputStream = null;
     public static BufferedReader reader = null;
     public static PrintWriter writer = null;
-
+    public static ArrayList<Integer> surveyAnswers = new ArrayList<>();
+    private static ArrayList<Integer> allSurveyAnswers = new ArrayList<>();
 
 
     // establish connection with server
@@ -21,7 +27,6 @@ public class Connection {
             // Blokkeer de thread tot er een volledige regel binnenkomt
             reader = new BufferedReader(
                     new InputStreamReader(inputStream));
-
 
 
 //            // loop ping method in a thread
@@ -56,9 +61,28 @@ public class Connection {
                     break;
                 }
 
-                if (msg.contains("PING")) {
-                      String message = "PONG";
-                      send(message);
+//                if (msg.contains("PING")) {
+//                      String message = "PONG";
+//                      send(message);
+//                }
+
+                if(msg.contains("QUESTION")) {
+                    //todo add user first
+                    System.out.println(msg);
+                    String[] split = msg.split("&");
+                    System.out.println("Question: " + split[1] + " " + split[2]);
+                    for (int i = 3; i < split.length; i++) {
+                        System.out.println((i-2) + ". " + split[i]);
+                    }
+                    System.out.println("Choose an answer:");
+                    int questionNumber = Integer.parseInt(split[1]);
+                    System.out.println(questionNumber);
+                    writer.println("ANSWERED");
+                    writer.flush();
+                }
+                if (msg.equals("Finished")){
+                    writer.print(allSurveyAnswers);
+                    writer.flush();
                 }
             }
             catch (IOException ignored) {
@@ -66,8 +90,6 @@ public class Connection {
             }
         }
     }
-
-
 
     public synchronized void send(String message)  {
         System.out.println("Sending message: " + message);

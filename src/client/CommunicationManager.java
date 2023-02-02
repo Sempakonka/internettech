@@ -1,3 +1,5 @@
+package client;
+
 import java.io.IOException;
 
 public class CommunicationManager {
@@ -24,9 +26,15 @@ public class CommunicationManager {
     public void directMessage(String name, String message) throws IOException {
         connection.send("DM "+name + " " + message);
     }
+    public void surveyCreate(String message) throws IOException {
+        connection.send("CRT " + message);
+    }
 
-    public void survey() throws IOException {
-        connection.send("SURVEY");
+    public void surveyJoin() throws IOException {
+        connection.send("JOIN ");
+    }
+    public void surveyAnswer(int answer) throws IOException {
+        connection.send("ANSWERED " + answer);
     }
 
     public void logout() throws IOException {
