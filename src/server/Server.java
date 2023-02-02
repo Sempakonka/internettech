@@ -5,13 +5,14 @@ import server.Receiver;
 
 import java.net.*;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Server extends Thread {
 
     public static Map<String, Socket> clients = new ConcurrentHashMap<>();
-    public static Map<String, Socket> surveyClients = new ConcurrentHashMap<>();
+    public static ArrayList<FileAccept> surveyClients = new ArrayList<>();
     public static int currentClients = 0;
 
 
@@ -62,29 +63,22 @@ public class Server extends Thread {
                 ServerSocket serverSocket = new ServerSocket(1338);
 
                 while (true) {
-                    Socket clientSocket = serverSocket.accept();
-                    DataInputStream dataInputStream = null;
-                    System.out.println(clientSocket + " connected.");
-                    dataInputStream = new DataInputStream(clientSocket.getInputStream());
+                    Socket socket = serverSocket.accept();
+                    System.out.println("FileReceiver connected");
+                 //   currentClients++;
 
+                    InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
+                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
-                    Socket downloadSocket = serverSocket.accept();
-                    System.out.println(downloadSocket + " connected.");
-                    DataOutputStream dataOutputStream = null;
-                    dataOutputStream = new DataOutputStream(downloadSocket.getOutputStream());
-                    System.out.println("dataOutputStream: " + dataOutputStream);
+                    Thread thread = new Thread(() -> {
+                        try {
+                            FilePasser.listen(socket, bufferedReader);
+                        } catch (IOException e) {
+                            System.out.println(e);
+                        }
+                    });
 
-
-
-                    int bytes = 0;
-
-                    long size = dataInputStream.readLong();     // read file size
-                    byte[] buffer = new byte[4 * 1024];
-                    while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
-                        System.out.println("bytes: " + bytes);
-                        dataOutputStream.write(buffer, 0, bytes);
-                        size -= bytes;      // read upto file size
-                    }
+                    thread.start();
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

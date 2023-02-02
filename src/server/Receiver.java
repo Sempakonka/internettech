@@ -121,6 +121,21 @@ public class Receiver {
                 receiverWriter.println("FILE-ACCEPT " + uploader + " " + downloader + " " + filepath);
                 receiverWriter.flush();
             }
+
+            if (msg.contains("FILE-DENY")) {
+                // this is the protocol
+                // "FILE-REJECT "+uploader + " " + downloader + " " + filepath
+                // ask the receiver if he wants to receive the file
+                String[] split = msg.split(" ");
+                String uploader = split[1];
+                String downloader = split[2];
+                String filepath = split[3];
+
+                // send the receiver a message
+                PrintWriter receiverWriter = new PrintWriter(Server.clients.get(uploader).getOutputStream());
+                receiverWriter.println("FILE-DENY " + uploader + " " + downloader + " " + filepath);
+                receiverWriter.flush();
+            }
         }
     }
 }

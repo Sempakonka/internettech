@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 public class Main {
 
+    public static BufferedReader commandLineReader = new BufferedReader(new InputStreamReader(System.in));
     public static void main(String[] args) throws IOException {
         //   Client client = new Client();
         Connection connection = new Connection();
@@ -19,7 +20,6 @@ public class Main {
     public static void commandLoop(Connection connection, CommunicationManager communicationManager) throws IOException {
         while (true) {
             // create a BufferedReader using System.in
-            BufferedReader obj = new BufferedReader(new InputStreamReader(System.in));
             String str;
 
             System.out.println("Enter lines of text.");
@@ -34,42 +34,42 @@ public class Main {
             do {
                 assert Connection.reader != null && Connection.writer != null && Connection.inputStream != null : "Connection not established";
 
-                str = obj.readLine();
+                str = commandLineReader.readLine();
                 // make all methods in Conn class
                 switch (str) {
                     case "login":
                         System.out.println("Enter your name:");
-                        str = obj.readLine();
+                        str = commandLineReader.readLine();
                         communicationManager.login(str);
                         break;
                     case "broadcast":
                         System.out.println("Enter your message:");
-                        str = obj.readLine();
+                        str = commandLineReader.readLine();
                         communicationManager.broadcast(str);
                         break;
                     case "dm":
                         System.out.println("Who do you want to message:");
-                        str = obj.readLine();
+                        str = commandLineReader.readLine();
                         System.out.println("What do you want to send to " + str + ":");
-                        String msg = obj.readLine();
+                        String msg = commandLineReader.readLine();
                         communicationManager.directMessage(str, msg);
                         break;
                     case "survey":
                         System.out.println("Enter create to create a survey");
                         System.out.println("Enter join to join a survey");
-                        str = obj.readLine();
+                        str = commandLineReader.readLine();
                         if (str.equals("create")) {
                             ArrayList<String> list = new ArrayList<>();
                             ArrayList<Integer> answerNumber = new ArrayList<>();
                             System.out.println("How many question do you want? (1-10 questions)");
-                            int question = Integer.parseInt(obj.readLine());
+                            int question = Integer.parseInt(commandLineReader.readLine());
                             int i = 1;
                             while (i <= question) {
                                 System.out.println("What is question " + i + "?");
-                                str = obj.readLine();
+                                str = commandLineReader.readLine();
                                 list.add(str);
                                 System.out.println("What are the answers?");
-                                int numbers = Integer.parseInt(obj.readLine());
+                                int numbers = Integer.parseInt(commandLineReader.readLine());
                                 answerNumber.add(numbers);
                                 i++;
                             }
@@ -85,16 +85,20 @@ public class Main {
                     case "stop":
                         break label;
                     case "else":
-                        str = obj.readLine();
+                        str = commandLineReader.readLine();
                         communicationManager.customCommand(str);
                     case "file":
                         System.out.println("Enter the file name: <IS HARDCODED>");
-                        str = obj.readLine();
+                        str = commandLineReader.readLine();
                         communicationManager.askToSendFile("/Users/sempakonka/Desktop/internetTech/internet_tech/file_to_send.jpeg", "sem1", "sem");
                         break;
-                    default:
-                        System.out.println("Invalid command");
+                    case "accept-file":
+                        System.out.println("from who do you accept the file:");
+                        str = commandLineReader.readLine();
+                  //      communicationManager.acceptFile("sem1", "sem");
                         break;
+                         default:
+                             System.out.println("Invalid command");
                 }
             } while (!str.equals("stop"));
             connection.close();

@@ -10,8 +10,6 @@ public class Connection {
     public static PrintWriter writer = null;
     public static Socket textSocket = null;
 
-
-
     // establish connection with server
     public void connect() throws IOException {
         try {
@@ -26,12 +24,11 @@ public class Connection {
                     new InputStreamReader(inputStream));
 
 
-
 //            // loop ping method in a thread
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    listen(reader);
+                    listen(reader, Main.commandLineReader);
                 }
             });
             thread.start();
@@ -40,7 +37,7 @@ public class Connection {
         }
     }
 
-    public void listen(BufferedReader reader)  {
+    public void listen(BufferedReader reader, BufferedReader obj)  {
         System.out.println("Listening...");
         while (true) {
             String msg = null;
@@ -76,16 +73,28 @@ public class Connection {
                     thread.start();
                 }
 
+                if (msg.contains("FILE-DENY")) {
+                    System.out.println("File request denied");
+                }
+
                 if (msg.contains("FILE-ASK")) {
-                    Thread thread = new Thread(new FileReceiver());
-                    thread.start();
-                    // sned FILE-ACCEPT back in this protocol
+                    // send FILE-ACCEPT back in this protocol
                     // "FILE-ACCEPT "+uploader + " " + downloader + " " + filepath
                     String[] split = msg.split(" ");
                     String uploader = split[1];
                     String downloader = split[2];
                     String filepath = split[3];
+                    System.out.println("You got a file request from: " + uploader);
+                    System.out.println("type OK if you want to accept the file: ");
+                    if (!str.equals("OK")) {
+                        System.out.println(str);
+                        System.out.println("File request denied");
+                        send("FILE-DENY " + uploader + " " + downloader + " " + filepath);
+                        return;
+                    }
                     String message = "FILE-ACCEPT " + uploader + " " + downloader + " " + filepath;
+                    Thread thread = new Thread(new FileReceiver(filepath));
+                    thread.start();
                     send(message);
                 }
             }
