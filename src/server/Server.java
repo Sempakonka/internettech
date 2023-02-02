@@ -6,6 +6,7 @@ import server.Receiver;
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,6 +14,9 @@ public class Server extends Thread {
 
     public static Map<String, Socket> clients = new ConcurrentHashMap<>();
     public static ArrayList<FileAccept> surveyClients = new ArrayList<>();
+    public static ArrayList<String> survey = new ArrayList<>();
+    private static List<Socket> connectedClients = new ArrayList<>();
+
     public static int currentClients = 0;
 
 
@@ -87,6 +91,16 @@ public class Server extends Thread {
 
         thread2.start();
         thread1.start();
+    }
+    private static void broadcastMessage(String message) {
+        for (Socket client : connectedClients) {
+            try {
+                PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+                out.println(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
 

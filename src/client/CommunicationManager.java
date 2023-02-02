@@ -27,12 +27,15 @@ public class CommunicationManager {
         connection.send("DM " + name + " " + message);
     }
 
-    public void surveyCreate(String option) throws IOException {
-        connection.send("SURVEY-CREATE");
+    public void surveyCreate(String message) throws IOException {
+        connection.send("CRT " + message);
     }
 
-    public void surveyJoin() {
-        connection.send("SURVEY-JOIN");
+    public void surveyJoin() throws IOException {
+        connection.send("JOIN ");
+    }
+    public void surveyAnswer(int answer) throws IOException {
+        connection.send("ANSWERED " + answer);
     }
 
     public void askToSendFile(String path, String downloader, String uploader) throws IOException {

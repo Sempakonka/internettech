@@ -58,25 +58,55 @@ public class Main {
                         System.out.println("Enter create to create a survey");
                         System.out.println("Enter join to join a survey");
                         str = commandLineReader.readLine();
-                        if (str.equals("create")) {
-                            ArrayList<String> list = new ArrayList<>();
-                            ArrayList<Integer> answerNumber = new ArrayList<>();
+                        if(str.equals("create")){
                             System.out.println("How many question do you want? (1-10 questions)");
-                            int question = Integer.parseInt(commandLineReader.readLine());
+                            int question =  Math.min(Integer.parseInt(commandLineReader.readLine()), 10)  ;
+                            System.out.println(question);
                             int i = 1;
-                            while (i <= question) {
-                                System.out.println("What is question " + i + "?");
+                            String sendData = "";
+                            while (i <= question){
+                                System.out.println("What is question " +i + "?");
                                 str = commandLineReader.readLine();
-                                list.add(str);
-                                System.out.println("What are the answers?");
-                                int numbers = Integer.parseInt(commandLineReader.readLine());
-                                answerNumber.add(numbers);
-                                i++;
+                                sendData = sendData + ";" + str;
+                                System.out.println("How many answers does this question have (2-4 answers)");
+                                int totalAnswers = Integer.parseInt(commandLineReader.readLine());
+                                if(totalAnswers >= 2 && totalAnswers <= 4) {
+                                    while (totalAnswers >= 1) {
+                                        System.out.println("What are the answers?");
+                                        String answerNumber = commandLineReader.readLine();
+                                        sendData = sendData + "&" + answerNumber;
+                                        totalAnswers--;
+                                    }
+                                    i++;
+                                }
+                                else {
+                                    System.out.println("The amount of questions is not accepted");
+                                    break;
+                                }
                             }
-                            msg = "";
-                            communicationManager.surveyCreate(msg);
-                        } else if (str.equals("join")) {
+                            System.out.println(sendData);
+                            communicationManager.surveyCreate(sendData);
+                            System.out.println("Survey questions have been send");
+                            break;
+                        } else if(str.equals("join")){
                             communicationManager.surveyJoin();
+                            while (true) {
+                                String input = commandLineReader.readLine();
+                                if (input.equals("FINISHED")) {
+                                    break;
+                                }
+                                try {
+                                    int answer = Integer.parseInt(input);
+                                    if (answer > 0 && answer < 5) {
+                                    //    surveyAnswers.add(answer);
+                                        communicationManager.surveyAnswer(answer);
+                                    } else {
+                                        System.out.println("Invalid input. Please enter a number between 1 and 4.");
+                                    }
+                                } catch (NumberFormatException e) {
+                                    System.out.println("Invalid input. Please enter a number between 1 and 4.");
+                                }
+                            }
                         }
                         break;
                     case "logout":

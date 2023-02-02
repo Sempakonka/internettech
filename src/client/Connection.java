@@ -61,6 +61,26 @@ public class Connection {
                       send(message);
                 }
 
+                if(msg.contains("QUESTION")) {
+                    //todo add user first
+                    System.out.println(msg);
+                    String[] split = msg.split("&");
+                    System.out.println("Question: " + split[1] + " " + split[2]);
+                    for (int i = 3; i < split.length; i++) {
+                        System.out.println((i-2) + ". " + split[i]);
+                    }
+                    System.out.println("Choose an answer:");
+                    int questionNumber = Integer.parseInt(split[1]);
+                    System.out.println(questionNumber);
+                    writer.println("ANSWERED");
+                    writer.flush();
+                }
+
+                if (msg.equals("Finished")){
+                    writer.print("NOT IMPLEMENTED");
+                    writer.flush();
+                }
+
                 // if msg contains FILE-ACCEPT
                 if (msg.contains("FILE-ACCEPT")) {
                     // split the message
@@ -86,6 +106,7 @@ public class Connection {
                     String filepath = split[3];
                     System.out.println("You got a file request from: " + uploader);
                     System.out.println("type OK if you want to accept the file: ");
+                    String str = obj.readLine();
                     if (!str.equals("OK")) {
                         System.out.println(str);
                         System.out.println("File request denied");
