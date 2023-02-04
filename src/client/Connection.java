@@ -81,15 +81,21 @@ public class Connection {
                 }
 
                 if (msg.contains("QUESTION")) {
+                    //Create a new thread
                     Thread t = new Thread(() -> {
+                        //split the string
                         String[] splitQuestions = msg.split(";");
                         for (int questionNumber = 1; questionNumber < splitQuestions.length; questionNumber++) {
+                            //Create a new arraylist that all answers are added to
                             ArrayList<Integer> answers = new ArrayList<>();
                             String[] split = splitQuestions[questionNumber].split("&");
                             System.out.println("Choose an answer:");
                             System.out.println("Question: " + split[0]);
+                            //Loop through all the items in split(1 question + answers)
                             for (int i = 1; i < split.length; i++) {
                                 System.out.println((i) + ". " + split[i]);
+                                //Add a 0 to the answers list, looks like this[0,0,0,0] for all questions.
+                                //Amount of 0's is equal to the amount of answers
                                 answers.add(0);
                             }
                             System.out.println("length: " + (split.length - 1));
@@ -104,6 +110,12 @@ public class Connection {
                                 int newValue = answers.get(answer - 1) + 1;
                                 answers.set(answer - 1, newValue);
                                 answersList.add(answers);
+                                //answerList's data looks like this [[0,1,0], [1,0], [0,0,0,1]]
+                                //if the answer is question 1: 2, question 2: 1, question 3: 4.
+                                //The 0's are put on every location and if the answer is selected one is added at its location.
+                                //In the backend all the answerList's need to be added together.
+                                //If this is a separate list that is answered: [[1,0,0], [0,1], [0,0,0,1]]
+                                //It should be combined to this: [[1,1,0], [1,1,], [0,0,0,2]]
                             } else {
                                 System.out.println("Invalid input. Please enter a number between 1 and " + split.length + ".");
                                 return;
