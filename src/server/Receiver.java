@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import static server.Server.survey;
-
 import static server.Server.currentClients;
 
 public class Receiver {
@@ -18,14 +17,14 @@ public class Receiver {
         printWriter.flush();
         int surveyWaiting = 0;
         int questionNumber = 1;
-        ArrayList<String> answers = new ArrayList<>();
+        ArrayList<String> allSurveyAnswers = new ArrayList<>();
 
 
         while (true) {
             Thread.currentThread().interrupt();
 
             String msg = bufferedReader.readLine();
-        //    System.out.println("Message: " + msg);
+            System.out.println("Message: " + msg);
 
             // if msg contains direct message
             if (msg.contains("DM")) {
@@ -35,13 +34,12 @@ public class Receiver {
 
                 // send message to receiver
                 PrintWriter receiverWriter = new PrintWriter(Server.clients.get(receiver).getOutputStream());
-                receiverWriter.println("DM " + message);
+                receiverWriter.println("DM;" + message);
                 receiverWriter.flush();
             }
 
-            else if(msg.contains("JOIN")) {
+            if(msg.contains("JOIN")) {
                 int surveyTakers = surveyWaiting + 1;
-                boolean notAnswered = false;
                 System.out.println(currentClients);
 //                while (currentClients < 3){
 //                    printWriter.println("Waiting for more participants...");
@@ -50,59 +48,43 @@ public class Receiver {
 //                    Thread.sleep(1000);
 //                }
                 System.out.println(survey);
-                String[] split = survey.get(0).split(";");
+                printWriter.println("QUESTION" + survey.get(0));
+                printWriter.flush();
 
-                long startTime = System.nanoTime();
+                long startTime = System.currentTimeMillis();
                 long elapsedTime = 0;
-                double seconds = 0;
                 int minutes = 0;
                 while (true) {
-                    elapsedTime = System.nanoTime() - startTime;
-                    seconds = (double) elapsedTime / 1_000_000_000;
-                    minutes = (int) (seconds / 60);
-                    while (split.length >= questionNumber && !notAnswered) {
-                        System.out.println("split: " + split.length);
-                        System.out.println("questionNumber: " + questionNumber);
-
-                        printWriter.println("QUESTION&" + questionNumber + "&" + split[questionNumber]);
+                    elapsedTime = System.currentTimeMillis() - startTime;
+                    minutes = (int) (elapsedTime / 60_000);
+                    if (minutes >= 1) {
+                        System.out.println("B-word");
+                        printWriter.println("FINISHED");
                         printWriter.flush();
-                        notAnswered = true;
-                        break;
-                    }
-                    while (true) {
-                        String line = bufferedReader.readLine();
-                        if (line == null) {
-                            break;
-                        }
-                        System.out.println(line);
-                        msg = line;
-                        if (msg.contains("ANSWERED")) {
-                            System.out.println("banana");
-                            String[] splitted = msg.split(" ");
-                            String message = splitted[1];
-                            answers.add(message);
-                            questionNumber++;
-                            System.out.println(answers);
-                            notAnswered = false;
-                        }
-                    }
-                    if (minutes >= 5) {
                         survey.remove(0);
-                        printWriter.println("Survey has finished");
-                        printWriter.flush();
                         break;
                     }
                 }
             }
-            else if(msg.contains("CRT")){
+            if(msg.contains("CRT")){
                 System.out.println("Bingo");
-                String[] split = msg.split(" ");
+                String[] split = msg.split("/");
                 String message = split[1];
                 survey.add(message);
                 System.out.println(message);
                 printWriter.println("Questions received: " + message);
                 printWriter.flush();
                 System.out.println("This is in the survey" + survey);
+            }
+            if(msg.contains("FINISHED")){
+                String[] split = msg.split("&");
+                String message = split[1];
+                System.out.println(message);
+                for (String client : Server.clients.keySet()) {
+                    PrintWriter clientWriter = new PrintWriter(Server.clients.get(client).getOutputStream());
+                    clientWriter.println("ANSWERS " + message);
+                    clientWriter.flush();
+                }
             }
 
             // if msg contains login
@@ -126,32 +108,6 @@ public class Receiver {
                         clientWriter.flush();
                     }
                 }
-            }
-            if(msg.contains("SURVEY-JOIN")) {
-                int surveyTakers = surveyWaiting + 1;
-                System.out.println(currentClients);
-                while (currentClients < 3){
-                    printWriter.println("Waiting for more participants...");
-                    printWriter.println("Current surveyors: "+ surveyTakers);
-                    printWriter.flush();
-                    Thread.sleep(1000);
-                }
-
-                if(currentClients > 3){
-                    long startTime = System.nanoTime();
-                    long elapsedTime = System.nanoTime() - startTime;
-                    double seconds = (double) elapsedTime / 1_000_000_000;
-                    System.out.println(seconds + " seconds");
-                    int minutes = (int) (seconds /60);
-                    System.out.println("Minutes " + minutes);
-
-                    while (minutes < 5){
-
-                    }
-                }
-            }
-            if(msg.contains("SURVEY-CREATE")){
-
             }
             if(msg.contains("STOP"))
             {

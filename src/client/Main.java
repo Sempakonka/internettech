@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 
 public class Main {
 
@@ -48,38 +47,54 @@ public class Main {
                         communicationManager.broadcast(str);
                         break;
                     case "dm":
+                        final String secretKey = "donotspeakAboutT";
                         System.out.println("Who do you want to message:");
                         str = commandLineReader.readLine();
                         System.out.println("What do you want to send to " + str + ":");
                         String msg = commandLineReader.readLine();
-                        communicationManager.directMessage(str, msg);
+                        String encFile = AES.encrypt(msg, secretKey);
+                        System.out.println("encrypted: " + encFile);
+                        String encFileRSA;
+                        try {
+                            RSA.initFromStrings();
+                            encFileRSA = RSA.encrypt(encFile);
+                            System.err.println("\nEncrypted:\n" + encFileRSA);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        String decFile = AES.decrypt(encFile, secretKey);
+                        System.out.println("Decrypted: " + decFile);
+                        communicationManager.directMessage(str, encFileRSA);
                         break;
                     case "survey":
                         System.out.println("Enter create to create a survey");
                         System.out.println("Enter join to join a survey");
                         str = commandLineReader.readLine();
-                        if(str.equals("create")){
+                        if (str.equals("create")) {
                             System.out.println("How many question do you want? (1-10 questions)");
-                            int question =  Math.min(Integer.parseInt(commandLineReader.readLine()), 10)  ;
+                            int question = Math.min(Integer.parseInt(commandLineReader.readLine()), 10);
                             System.out.println(question);
                             int i = 1;
                             String sendData = "";
-                            while (i <= question){
-                                System.out.println("What is question " +i + "?");
+                            while (i <= question) {
+                                System.out.println("What is question " + i + "?");
                                 str = commandLineReader.readLine();
                                 sendData = sendData + ";" + str;
                                 System.out.println("How many answers does this question have (2-4 answers)");
                                 int totalAnswers = Integer.parseInt(commandLineReader.readLine());
-                                if(totalAnswers >= 2 && totalAnswers <= 4) {
+                                if (totalAnswers >= 2 && totalAnswers <= 4) {
                                     while (totalAnswers >= 1) {
                                         System.out.println("What are the answers?");
                                         String answerNumber = commandLineReader.readLine();
+                                        if (answerNumber == null) {
+                                            break;
+                                        }
                                         sendData = sendData + "&" + answerNumber;
                                         totalAnswers--;
                                     }
                                     i++;
-                                }
-                                else {
+                                } else {
                                     System.out.println("The amount of questions is not accepted");
                                     break;
                                 }
@@ -88,25 +103,8 @@ public class Main {
                             communicationManager.surveyCreate(sendData);
                             System.out.println("Survey questions have been send");
                             break;
-                        } else if(str.equals("join")){
+                        } else if (str.equals("join")) {
                             communicationManager.surveyJoin();
-                            while (true) {
-                                String input = commandLineReader.readLine();
-                                if (input.equals("FINISHED")) {
-                                    break;
-                                }
-                                try {
-                                    int answer = Integer.parseInt(input);
-                                    if (answer > 0 && answer < 5) {
-                                    //    surveyAnswers.add(answer);
-                                        communicationManager.surveyAnswer(answer);
-                                    } else {
-                                        System.out.println("Invalid input. Please enter a number between 1 and 4.");
-                                    }
-                                } catch (NumberFormatException e) {
-                                    System.out.println("Invalid input. Please enter a number between 1 and 4.");
-                                }
-                            }
                         }
                         break;
                     case "logout":
@@ -118,17 +116,19 @@ public class Main {
                         str = commandLineReader.readLine();
                         communicationManager.customCommand(str);
                     case "file":
+                        String path = "/Users/nilst/Documents/GitHub/internettech/src/SamplePhoto_1.jpg";
                         System.out.println("Enter the file name: <IS HARDCODED>");
                         str = commandLineReader.readLine();
-                        communicationManager.askToSendFile("/Users/sempakonka/Desktop/internetTech/internet_tech/file_to_send.jpeg", "sem1", "sem");
+
+                        communicationManager.askToSendFile("/Users/nilst/Documents/GitHub/internettech/src/SamplePhoto_1.jpg", "sem1", "sem");
                         break;
                     case "accept-file":
                         System.out.println("from who do you accept the file:");
                         str = commandLineReader.readLine();
-                  //      communicationManager.acceptFile("sem1", "sem");
+                        //      communicationManager.acceptFile("sem1", "sem");
                         break;
-                         default:
-                             System.out.println("Invalid command");
+                    default:
+                        System.out.println("Invalid command");
                 }
             } while (!str.equals("stop"));
             connection.close();

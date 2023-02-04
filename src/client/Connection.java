@@ -2,6 +2,9 @@ package client;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class Connection {
 
@@ -9,6 +12,7 @@ public class Connection {
     public static BufferedReader reader = null;
     public static PrintWriter writer = null;
     public static Socket textSocket = null;
+    private static ArrayList<ArrayList> answersList = new ArrayList<>();
 
     // establish connection with server
     public void connect() throws IOException {
@@ -40,10 +44,9 @@ public class Connection {
     public void listen(BufferedReader reader, BufferedReader obj)  {
         System.out.println("Listening...");
         while (true) {
-            String msg = null;
             try {
                 // read the message from the server
-                msg = reader.readLine();
+                String msg = reader.readLine();
 
 
                 System.out.println("Received msg: " + msg);
@@ -60,25 +63,61 @@ public class Connection {
                       String message = "PONG";
                       send(message);
                 }
+                if(msg.contains("DM")) {
+                    final String secretKey = "donotspeakAboutT";
+                    String[] split = msg.split(";");
+                    System.out.println(split[1]);
 
-                if(msg.contains("QUESTION")) {
-                    //todo add user first
-                    System.out.println(msg);
-                    String[] split = msg.split("&");
-                    System.out.println("Question: " + split[1] + " " + split[2]);
-                    for (int i = 3; i < split.length; i++) {
-                        System.out.println((i-2) + ". " + split[i]);
+                    String decFileRSA = null;
+                    try {
+                        RSA.initFromStrings();
+                        decFileRSA = RSA.decrypt(split[1]);
+                        System.err.println("\nDecrypted:\n" + decFileRSA);
+                    } catch (Exception e) {
+
                     }
-                    System.out.println("Choose an answer:");
-                    int questionNumber = Integer.parseInt(split[1]);
-                    System.out.println(questionNumber);
-                    writer.println("ANSWERED");
-                    writer.flush();
+                    String decFile = AES.decrypt(decFileRSA, secretKey);
+                    System.out.println("Decrypted: " + decFile);
                 }
 
-                if (msg.equals("Finished")){
-                    writer.print("NOT IMPLEMENTED");
-                    writer.flush();
+                if (msg.contains("QUESTION")) {
+                    Thread t = new Thread(() -> {
+                        String[] splitQuestions = msg.split(";");
+                        for (int questionNumber = 1; questionNumber < splitQuestions.length; questionNumber++) {
+                            ArrayList<Integer> answers = new ArrayList<>();
+                            String[] split = splitQuestions[questionNumber].split("&");
+                            System.out.println("Choose an answer:");
+                            System.out.println("Question: " + split[0]);
+                            for (int i = 1; i < split.length; i++) {
+                                System.out.println((i) + ". " + split[i]);
+                                answers.add(0);
+                            }
+                            System.out.println("length: " + (split.length - 1));
+                            String str = null;
+                            try {
+                                str = obj.readLine();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                            int answer = Integer.parseInt(str);
+                            if (answer > 0 && answer < split.length) {
+                                int newValue = answers.get(answer - 1) + 1;
+                                answers.set(answer - 1, newValue);
+                                answersList.add(answers);
+                            } else {
+                                System.out.println("Invalid input. Please enter a number between 1 and " + split.length + ".");
+                                return;
+                            }
+                        }
+                        System.out.println("banana");
+                        send("FINISHED&" + answersList);
+                    });
+                    t.start();
+                }
+
+                if (msg.equals("FINISHED")){
+                    send("FINISHED&" + answersList);
+                    break;
                 }
 
                 // if msg contains FILE-ACCEPT
